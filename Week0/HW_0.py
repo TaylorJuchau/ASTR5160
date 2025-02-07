@@ -98,7 +98,7 @@ plt.savefig("HW_0_figure.png", dpi=300, bbox_inches='tight')
 plt.show()'''
 
 
-# In[5]:
+# In[17]:
 
 
 #problem 5
@@ -117,9 +117,9 @@ def do_HW_0(m,b):
     y_data = data_array_unsorted[1][sorted_indices] #TJ create array of y_data that is sorted
     error_bars = abs(data_array_unsorted[2][sorted_indices])
     plt.plot(x_range, linear_func(x_range, m, b), label = f"orignal y = {np.round(m,1)}x+{np.round(b,1)} line", color = 'red', linestyle='dotted') # TJ plot after errors
-    plt.scatter(x_data, y_data, marker = 'o')
-    plt.plot(x_data, y_data, label = 'original line w/ error added', color = 'blue') #TJ plot original y=mx+b line
-    plt.errorbar(x_data, y_data, yerr=0.5, xerr=0, label='')
+    #plt.scatter(x_data, y_data, marker = 'o')
+    #plt.scatter(x_data, y_data, label = 'original line w/ error added', color = 'blue')
+    plt.errorbar(x_data, y_data, yerr=0.5, xerr=0, fmt='o', label='generated datapoints')
     plt.plot(x_range, linear_func(x_range, *params), linestyle='dashed', label = "reconsituted line from fitted paramters", color = 'purple')
     plt.legend()
     plt.xlim(0, 10)  #TJ Set x-axis to be 0 to 10, since thats the range the x-values were selected in
@@ -134,7 +134,7 @@ def do_HW_0(m,b):
     return None
 
 
-# In[6]:
+# In[18]:
 
 
 if __name__ == "__main__":
