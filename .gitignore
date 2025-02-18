@@ -1,3 +1,4 @@
 .*
 *.fits
+Data_files
 !.gitignore
