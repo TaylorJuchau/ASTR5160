@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[38]:
+# In[41]:
 
 
 import matplotlib.pyplot as plt
@@ -82,24 +82,11 @@ def find_lowest_airmass(argument):
         return None
     month_lengths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] #TJ assign lengths of each month
     month_length = month_lengths[month-1] #TJ assign the appropriate number of days in the given month
-
-    rows = [["Date", "Quasar Coordinates \n(hhmmss.ss ◦ ′ ′′)", "RA \nDegrees (◦)", "Dec \nDegrees (◦)", "Airmass"]]
-    #TJ Wow FUCK daylight savings time! this just got a whole lot harder... hopefully I did this correctly.
+    utcoffset = -7 * u.hour  #TJ define offset from UTC to Mountain Standard Time outside daylight savings
+    start_time = Time(f"{year}-{month}-02 06:00:00") + utcoffset #TJ assign start date to be the 1st at 11pm MST
+    rows = [["Date \nYYYY-MM-DD HH:MM:SS.SSS MST", "Quasar Coordinates \n(hhmmss.ss ◦ ′ ′′)", "RA \nDegrees (◦)", "Dec \nDegrees (◦)", "Airmass"]]
     for day in range(0,month_length):
-        if month < 3 or month > 11:
-            utcoffset = -7 * u.hour  #TJ define offset from UTC to Mountain time outside of daylight savings
-        elif month > 3 and month < 11:
-            utcoffset = -6 * u.hour  #TJ define offset from UTC to Mountain time during daylight savings
-        elif month == 3 and day < 8:
-            utcoffset = -7 * u.hour  #TJ define offset from UTC to Mountain time outside of daylight savings
-        elif month == 3 and day > 7:
-            utcoffset = -6 * u.hour  #TJ define offset from UTC to Mountain time during daylight savings
-        elif month == 11 and day < 1:
-            utcoffset = -6 * u.hour  #TJ define offset from UTC to Mountain time outside of daylight savings
-        elif month == 11 and day > 0:
-            utcoffset = -7 * u.hour  #TJ define offset from UTC to Mountain time during daylight savings
-        start_time = Time(f"{year}-{month}-02 06:00:00") + utcoffset #TJ assign start date each time depending on if Daylight savings time is on.
-        obs_time = start_time + day*24*u.hour #TJ observation time is a set number of days after start time (not 24 hours after previous time because fuck daylight savings)
+        obs_time = start_time + day*24*u.hour #TJ observation time is an integer number of days after start time
         QSO_altaz_tonight = QSO_locations.transform_to(AltAz(obstime=obs_time, location=Observing_location)) #TJ get altitude and azimuth at this night
         airmass_array = QSO_altaz_tonight.secz #TJ get airmass at this time
         positive_airmass_indices = np.where(airmass_array > 0)[0]  #TJ Get indices of positive values for airmass
