@@ -46,7 +46,7 @@ print('Coefficient of variation: ', np.std(counts)/np.mean(counts)) #TJ take the
 print('This is very small, indicating that each pixel has about the same number of points in it')
 
 
-# In[55]:
+# In[63]:
 
 
 #Python task #4 plot pixels 2, 5 and 8
@@ -64,21 +64,18 @@ plt.legend(loc = 'upper left')
 plt.show()
 
 
-#TJ Tried finding where this pixels are on a sphere, but this doesnt look right...
-'''fig = plt.figure()
+fig = plt.figure()
 ax = fig.add_subplot(111, projection="aitoff")
-ax.scatter(ra, dec, s=0.001, color = 'black')
-ax.scatter(ra[ii], dec[ii], s = 0.1, color = 'red', label = 'pixel 2')
-ax.scatter(ra[v], dec[v], s = 0.1, color = 'blue', label = 'pixel 5')
-ax.scatter(ra[viii], dec[viii], s = 0.1, color = 'green', label = 'pixel 8')
+ax.scatter((ra-180)*np.pi/180, dec*np.pi/180, s=0.001, color = 'black')
+ax.scatter((ra[ii]-180)*np.pi/180, dec[ii]*np.pi/180, s = 0.1, color = 'red', label = 'pixel 2')
+ax.scatter((ra[v]-180)*np.pi/180, dec[v]*np.pi/180, s = 0.1, color = 'blue', label = 'pixel 5')
+ax.scatter((ra[viii]-180)*np.pi/180, dec[viii]*np.pi/180, s = 0.1, color = 'green', label = 'pixel 8')
 xlab = ['14h','16h','18h','20h','22h','0h','2h','4h','6h','8h','10h']
 ax.set_xticklabels(xlab, weight=600)
 ax.grid(color='blue', linestyle='--', linewidth=2)
 ax.set_xlabel("Right Ascension", fontsize=12)
 ax.set_ylabel("Declination", fontsize=12)
 ax.set_title("Aitoff Projection of random dots", fontsize=12)
-ax.legend(loc = 'lower left')'''
-print('') #TJ just to avoid printing that whole commented out section
 
 
 # In[60]:

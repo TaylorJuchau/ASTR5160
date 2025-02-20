@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[41]:
+# In[1]:
 
 
 import matplotlib.pyplot as plt
@@ -80,22 +80,24 @@ def find_lowest_airmass(argument):
     else:
         print('month not in recognizable format: acceptable arguments are integers between 1-12, or three letter abreviation of month, or full month. \nString arguments must start with a capital letter')
         return None
-    month_lengths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] #TJ assign lengths of each month
+    month_lengths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] #TJ assign lengths of each month, could be done neater if needed to do other years
     month_length = month_lengths[month-1] #TJ assign the appropriate number of days in the given month
     utcoffset = -7 * u.hour  #TJ define offset from UTC to Mountain Standard Time outside daylight savings
-    start_time = Time(f"{year}-{month}-02 06:00:00") + utcoffset #TJ assign start date to be the 1st at 11pm MST
+    start_time = Time(f"{year}-{month}-02 06:00:00")#TJ assign start date to be the 1st at 11pm MST, but in utc
+    #TJ define table headers and initialize table array as "rows"
     rows = [["Date \nYYYY-MM-DD HH:MM:SS.SSS MST", "Quasar Coordinates \n(hhmmss.ss ◦ ′ ′′)", "RA \nDegrees (◦)", "Dec \nDegrees (◦)", "Airmass"]]
     for day in range(0,month_length):
         obs_time = start_time + day*24*u.hour #TJ observation time is an integer number of days after start time
+        table_time = obs_time + utcoffset
         QSO_altaz_tonight = QSO_locations.transform_to(AltAz(obstime=obs_time, location=Observing_location)) #TJ get altitude and azimuth at this night
         airmass_array = QSO_altaz_tonight.secz #TJ get airmass at this time
         positive_airmass_indices = np.where(airmass_array > 0)[0]  #TJ Get indices of positive values for airmass
         prime_object_index = positive_airmass_indices[np.argmin(airmass_array[positive_airmass_indices])] #TJ extract lowest positive airmass
-        time = Time(f"{year}-{month}-{day+1} 11:00:00") #TJ set obs_time manually because daylight savings time screws up just using obs_time.value
+        np.set_printoptions(threshold=np.inf)
         prime_object_raw_location = lines[prime_object_index].strip() #TJ get raw location in given units for table
         RA, Dec = QSO_locations[prime_object_index].ra.deg, QSO_locations[prime_object_index].dec.deg #TJ get RA and Dec in normal person units
         min_air_mass = airmass_array[prime_object_index] #TJ get airmass for table
-        rows.append([time, prime_object_raw_location, RA, Dec, min_air_mass]) #TJ add this day's data to table
+        rows.append([table_time, prime_object_raw_location, RA, Dec, min_air_mass]) #TJ add this day's data to table
     print(tabulate(rows[1:], headers = rows[0])) #TJ print table
     
     return None
