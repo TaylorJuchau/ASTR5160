@@ -32,8 +32,9 @@ def define_cap_bounded_by_ra(right_ascension):
     cap_xyz = center.cartesian #TJ convert to x, y, z values
     h = 1 #TJ set height of cap to 2
     return (float(cap_xyz.x), float(cap_xyz.y), float(cap_xyz.z), 1)
-answer = define_cap_bounded_by_ra(5)
-print(answer)
+if __name__ == "__main__":
+    answer = define_cap_bounded_by_ra(5)
+    print(answer)
 
 
 # In[41]:
@@ -65,8 +66,9 @@ def define_cap_bounded_by_dec(declination):
     if abs(cap_xyz.z) < 0.00000001:
         z = 0.
     return (x, y, z, float(1-h))
-answer = define_cap_bounded_by_dec(36)
-print(answer)
+if __name__ == "__main__":
+    answer = define_cap_bounded_by_dec(36)
+    print(answer)
 
 
 # In[51]:
@@ -99,8 +101,9 @@ def define_cap(Right_Ascension, Declination, Radius):
         z = 0.
     h = np.cos(Radius*u.deg)
     return (x, y, z, float(1-h))
-answer = define_cap(5,36,1)
-print(answer)
+if __name__ == "__main__":
+    answer = define_cap(5,36,1)
+    print(answer)
 
 
 # In[ ]:
