@@ -1,13 +1,22 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[8]:
 
 
-import pymangle
-from Class10_notebook import *
+#import packages
 import numpy as np
 import matplotlib.pyplot as plt
+try: 
+    from Class10_notebook import *
+except ModuleNotFoundError:
+    import os
+    import sys
+    week5_path = os.path.abspath(os.path.join(os.path.dirname('__file__'), "..", "Week5")) #TJ this creates a path to Week5 files 
+    sys.path.insert(0, week5_path) #TJ adds the path to Week5
+    from Class10_notebook import *
+if __name__=="__main__":
+    import pymangle
 
 
 # In[2]:
@@ -15,7 +24,7 @@ import matplotlib.pyplot as plt
 
 #Python task #1 define two caps
 
-def make_mangle_file(name, polygons):
+def make_mangle_file(name, polygons, weight = None, steradians = None):
     '''Create polygon file from caps
 
     Needs packages
@@ -25,23 +34,34 @@ def make_mangle_file(name, polygons):
 
     Parameters
     -------------
-    name : the name of the .ply file that will get created
-    polygons : array of polygons, each polygon contains all the caps that comprise it
+    name : type = str - the name of the .ply file that will get created
+    polygons : type = list - contains entries for each polygon, each polygon contains all the caps that comprise it
+    weights (optional, defaults to 1) : type = list of floats - specifies how many spaces are allocated for each cap for numbers to be generated in
+    steradians (optional, defaults to 0) : type = list of floats - defines the area of the region in steradians
+    
     use define_cap(RA, Dec, radius) to make a 4-vector for each cap
+    
             for example: [1] cap1, cap2, cap3 = define_cap(1, 1, 1), define_cap(2, 2, 2), define_cap(3, 3, 3)
                          [2] polygon = [[cap1, cap2, cap3],[cap1],[cap4, cap5]]
-                         [3] make_mangle_file('test1', polygon) 
+                         [3] weights = [0.5, 1, 2]
+                         [4] make_mangle_file('test1', polygon, weight = weights) 
                              will create a file called  test1.ply with 3 polygons:
                              the first has 3 caps, the second has 1 cap, and the third has 2 caps
+                             the first region has been deweighted to have half as many points in it, while the third region has twice as many.
+                             
                         
     
     Returns
     -------------
     Nothing. But creates a .ply file in the working directory'''
+    if weight == None:
+        weight = [1]*len(polygons)
+    if steradians == None:
+        steradians = [0]*len(polygons)
     with open(f"{name}.ply", "w") as file: #TJ open file with writing permission
         file.write(f"{len(polygons)} polygons\n") #TJ first line is just the number of polygons
         for poly in range(len(polygons)):   #TJ for each polygon, title it with polygon 1, polygon 2, etc, add number of caps, weights, and steradians
-            file.write(f"polygon {poly+1} ({len(polygons[poly])} caps, 1 weight, 0 pixel, 0 str):\n")
+            file.write(f"polygon {poly+1} ({len(polygons[poly])} caps, {weight[poly]} weight, 0 pixel, {steradians[poly]} str):\n")
             for cap in range(len(polygons[poly])): #TJ for each cap, extract the vector components
                 file.write(f"\t{polygons[poly][cap][0]:.12f} {polygons[poly][cap][1]:.12f} {polygons[poly][cap][2]:.12f} {polygons[poly][cap][3]:.12f}\n")
 
@@ -98,7 +118,7 @@ if __name__ == "__main__":
     plt.show()
 
 
-# In[6]:
+# In[ ]:
 
 
 #Python task #5 flip constraint on cap2 and plot all of them
@@ -133,6 +153,12 @@ if __name__ == "__main__":
     plt.scatter(ra_double_flip,dec_double_flip, s=0.1, color = 'blue', label = 'double flipped')
     plt.legend('lower left')
     plt.show()
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:

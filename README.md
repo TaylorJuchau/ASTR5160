@@ -27,10 +27,14 @@ Astronomical Techniques II Spring 2025
 
 HW1 --------------------Find lowest airmass object for every day in a month
 
-
 ############################################
 # Week5 #
 
 # Class9_notebook ------break sphere into pixels, color each pixel differently, count how many dots are in each pixel.
 # Class10_notebook -----caps bound by RA or dec, or centered around a point with a radius of a number of degrees
 
+############################################
+# Week6 #
+
+# Class11_notebook -----Mangle files, finding overlapping regions on a sphere
+# Class12_notebook -----
