@@ -1,4 +1,4 @@
-# ASTR5160
+# ASTR5160 #
 Astronomical Techniques II Spring 2025
 
 # Homeworks:
