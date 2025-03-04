@@ -2,9 +2,9 @@
 Astronomical Techniques II Spring 2025
 
 # Homeworks:
-HW_0 -----------------make a line, and scatter points away from it
+HW_0 ---Week0------------make a line, and scatter points away from it
 
-HW1 --------------------Find lowest airmass object for every day in a month
+HW_1 ---Week4------------Find lowest airmass object for every day in a month
 
 # Week2 #
 
