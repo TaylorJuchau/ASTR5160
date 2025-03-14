@@ -12,7 +12,7 @@ data_file_location = "C:/Users/tj360/ASTR5160/Data_files/Class15_SQL_query.csv"
 #TJ local data files stored in this folder (not synced to github)
 
 
-# In[2]:
+# In[7]:
 
 
 #Python task 2 plot ra and dec using circles
@@ -24,12 +24,13 @@ plt.ylabel('dec (degrees)')
 #TJ matplotlib kept displaying the x-axis as centred at 0, with ticks being +3e2, this fixes that
 plt.ticklabel_format(useOffset=False, axis='x') 
 plt.gca().invert_xaxis() #TJ invert x-axis so RA decreases to the right.
+plt.title("circles representing objects within 2' of ra,dec = 300,-1")
 
 
 plt.show()
 
 
-# In[5]:
+# In[14]:
 
 
 #Python task #3 make size represent g-magnitude
@@ -43,8 +44,7 @@ plt.xlabel('ra (degrees)')
 plt.ylabel('dec (degrees)')
 plt.ticklabel_format(useOffset=False, axis='x') #TJ fix offset problem
 plt.gca().invert_xaxis() #TJ invert x-axis
-
-
+plt.title("circles representing objects within 2' of ra,dec = 300,-1\nsize of circles represent g_magnitude")
 plt.show()
 
 
