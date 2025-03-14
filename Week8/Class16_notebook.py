@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[53]:
+# In[1]:
 
 
 #TJ import needed functions
@@ -15,7 +15,7 @@ if __name__ == "__main__":
     import numpy as np
 
 
-# In[26]:
+# In[2]:
 
 
 #Python task #1 read in data and plot locations
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     print('done')
 
 
-# In[6]:
+# In[ ]:
 
 
 #python task #3 run this query on first 100 datapoints
@@ -83,9 +83,6 @@ def query_n_objects(num_objects, dataset_file, new_file, start = 0, wipe = False
     if wipe == True:
         open("testing_sql_query.txt", "w").close()
     for i in range(start,num_objects):
-        retries = 0
-        max_retries = 3
-        wait_time = 3
         ra, dec = t['RA'][i], t['DEC'][i]
         print(f'querying object {i+1}')
         os.system(f"python sdssDR9query.py {ra} {dec} >> {new_file}")
@@ -102,18 +99,18 @@ if __name__ == "__main__":
 # In[ ]:
 
 
-#python task #4 and #5 take a look at a sweep file
+#python task #4 and #5 take a look at a couple of sweep files
 if __name__ == "__main__":
     file_1 = get_pkg_data_filename('/d/scratch/ASTR5160/data/legacysurvey/dr9/north/sweep/9.0/sweep-150p030-160p035.fits')
     t = Table.read(file_1)
     new_file = 'Class16_query.txt'
-    query_n_objects(30, file_location, new_file, start = 0, wipe = True)
+    query_n_objects(10, file_location, new_file, start = 0, wipe = True)
     file_2 = get_pkg_data_filename('/d/scratch/ASTR5160/data/legacysurvey/dr9/north/sweep/9.0/sweep-230p025-240p030.fits')
     new_file = 'Class16_query.txt'
-    query_n_objects(30, file_location, new_file, start = 0, wipe = False)
+    query_n_objects(10, file_location, new_file, start = 0, wipe = False)
 
 
-# In[67]:
+# In[ ]:
 
 
 #python task #6 find which files have which RA and dec locations
@@ -262,7 +259,7 @@ if __name__ == "__main__":
 
 
 
-# In[1]:
+# In[ ]:
 
 
 
