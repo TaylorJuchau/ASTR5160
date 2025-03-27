@@ -1,105 +1,150 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[5]:
+# In[51]:
 
 
-def plot_rectangles(boxes, name = 'lat-long rectangles in aitoff-projection.png', radians=False):
-    '''Plot rectangles bounded by ra_min, ra_max, dec_min, dec_max, where:
-        boxes = [[ra_min1, ra_max1, dec_min1, dec_max1], [ra_min2, ra_max2, dec_min2, dec_max2]]
+def find_latlong_area(box, radians = False, vertices = False):
+    '''find area enclosed in a lat-long box defined as box = [ra_min, ra_max, dec_min, dec_max] in square degrees
     
-    imports needed packages automatically
+    *imports needed packages automatically
     
     Parameters
     -------------
-    box : type = list - contains entries for each corner of the lat-long rectangle
-                        all coordinates given in degrees
-    name (optional, defaults to 'lat-long rectangles in aitoff-projection.png'): type = str - name of .png file
+    box : type = list - list of ra_min, ra_max, dec_min, dec_max
+    
+    radians (optional, defaults to False) : type = boolean - true if boundaries are defined in radians
+    
+    vertices (optional, defaults to False) : type = boolean - specifies whether the box is given as a set of boundaries
+                                            or as a list of vertices 
 
-    radians (optional, defaults to False): type = boolean
     Returns
     -------------
-    boxes = list of boxes in format [ra_min, ra_max, dec_min, dec_max]
-    areas = list of areas of each of the boxes in square degrees.
-    Also saves a .png file into working directory
-    '''
+    area contained within the lat-long box in square degrees
     
-    import matplotlib.pyplot as plt
-    import matplotlib.cm as cm
+    '''
+
     import numpy as np
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection="aitoff") #TJ set projection format
-    if isinstance(boxes[0], int) or isinstance(boxes[0], float):
-        #TJ if there is only one box, perform function on the single box
-        if radians == False:
-            ra_min, ra_max, dec_min, dec_max = np.radians(boxes) #TJ this makes sure ra/dec are in radians
-            
-        #TJ make a path that circles around the whole box perimeter
-        ra_path = [ra_min, ra_max, ra_max, ra_min, ra_min] 
-        dec_path = [dec_min, dec_min, dec_max, dec_max, dec_min]
-        
-        areas = ((ra_max - ra_min)*(np.sin(dec_max) - np.sin(dec_min)))*((180/np.pi)**2) #TJ calculate area for the box
-        
-        #TJ plot the box in red and label it with its area in square degrees
-        ax.plot(ra_path, dec_path, color='red',linestyle = '-', linewidth=2, 
-                label = f"custom box (area: {np.round(areas, 1)} sq deg)")
-    else: #TJ if the first entry in boxes is a list or array, iterate through each entry as individual boxes
-        colors = cm.rainbow(np.linspace(1, 0, len(boxes))) #TJ this is prep for each box to be a different color
-        areas = [] #TJ initialize area list
-        for i, b in enumerate(boxes): #TJ iterate through each box and do what is described above to each box
-            if radians == False:
-                ra_min, ra_max = np.radians([b[0], b[1]])
-                dec_min, dec_max = np.radians([b[2], b[3]])
-            else:
-                ra_min, ra_max = [b[0], b[1]]
-                dec_min, dec_max = [b[2], b[3]]
-            ra_path = [ra_min, ra_max, ra_max, ra_min, ra_min]
-            dec_path = [dec_min, dec_min, dec_max, dec_max, dec_min]
-            area = ((ra_max - ra_min)*(np.sin(dec_max) - np.sin(dec_min)))*((180/np.pi)**2)
-            areas.append(area) #TJ this isnt optimal, but the "boxes" array will never be large, so it should be fine
-            ax.plot(ra_path, dec_path, color=colors[i],linestyle='-', linewidth=2, 
-                    label = f"box {i+1} (area: {np.round(area, 1)} sq deg)")
     
-    xlab = ['14h','16h','18h','20h','22h','0h','2h','4h','6h','8h','10h'] #TJ set right ascension tick labels
-    ax.set_xticklabels(xlab, weight=300)
-    ax.grid(color='black', linestyle='--', linewidth=0.5) #TJ make grid lines pretty thin so box borders show up better
-    ax.set_xlabel("Right Ascension", fontsize=12)
-    ax.set_ylabel("Declination", fontsize=12)
-    ax.set_title("Aitoff Projection with rectangles", fontsize=12)
-    ax.legend(bbox_to_anchor=(1, 0.55))
-    plt.savefig(name, dpi=300, bbox_inches='tight') #TJ save .png of figure to working directory
-    plt.show()
-    return areas
+    if not radians:
+        box = np.radians(box)
+    if vertices: #TJ if box is given as a set of vertices, convert to format [ra_min, ra_max, dec_min, dec_max]
+        ra_min = min([b[0] for b in box])
+        ra_max = max([b[0] for b in box])
+        dec_min = min([b[1] for b in box])
+        dec_max = max([b[1] for b in box])
+    if not vertices: #TJ if box is given as boundaries, assign ra/dec _ min/max accordingly
+        ra_min, ra_max, dec_min, dec_max = box
+    #TJ compute area and convert to square degrees
+    return ((ra_max - ra_min)*(np.sin(dec_max) - np.sin(dec_min)))*((180/np.pi)**2) 
 
-
-def find_ratios(list):
-    '''take a list of real numbers, express the list as a ratio to the smallest member of the list
-        for example: x = [6, 3, 10, 15]
-                     find_ratios(x) will return [2, 1, 3.3, 5]
-
+def boundaries_to_vertices(box, radians = False):
+    '''Convert a box defined as bounded by [ra_min, ra_max, dec_min, dec_max] to a box defined by its vertices
+    new box will be given as set of vertices sorted to be counter-clockwise:
+                        [[ra_min, dec_min], [ra_max, dec_min], [ra_max, dec_max], [ra_min, dec_max]]
+    
+    *imports needed packages automatically
+    
     Parameters
     -------------
-    list : type = list - contains entries that are all real numbers
+    dot : type = list - boundaries of lat-long box in the format [ra_min, ra_max, dec_min, dec_max]
+    
+    radians (optional, defaults to False) : type = boolean - True if coordinates of vertices are in radians
 
     Returns
     -------------
-    normalized list
+    vertices : type = list - vertices of lat-long box in format: 
+    [[ra_min, dec_min], [ra_max, dec_min], [ra_max, dec_max], [ra_min, dec_max]] in degrees
+    '''
+    
+    if radians:
+        import numpy as np
+        box = np.degrees(box)
+    return [[box[0],box[2]], [box[1], box[2]], [box[1],box[3]], [box[0], box[3]]]
+    
+    
+
+    
+def cartesian(dot, radians = True):
+    '''Convert (ra, dec) to Cartesian coordinates x, y, z.
+    
+    *imports needed packages automatically
+    
+    Parameters
+    -------------
+    dot : type = list - coordinates for a dot in right ascension and declination in format [ra,dec]
+    
+    radians (optional, defaults to True) : type = boolean - True if coordinates of vertices are in radians
+
+    Returns
+    -------------
+    3-vector [x, y, z] representing the same point on a unit sphere as the given dot
     
     '''
     
-    n_min = min(list) #TJ find the minimum value in the list to normalize to
-    return [x/n_min for x in list] #TJ return the original list, normalized to that smallest area
+    if not radians: #TJ convert to radians if needed
+        dot = np.radians(dot)
+    ra, dec = dot
+    return [np.cos(dec) * np.cos(ra), np.cos(dec) * np.sin(ra), np.sin(dec)]
+    
+
+
+def find_polygon_area(vertices, radians = True):
+    '''find area enclosed by a polygon in square degrees, made from vertices connected by sections of great circles.
+    
+    **Important note** lat-lon boxes are NOT bounded by sections of great circles!!!
+    **Use find_latlong_area() instead for these regions.
+    
+    *imports needed packages automatically
+    
+    Parameters
+    -------------
+    vertices : type = list - list of vertices [[ra1,dec1], [ra2,dec2], [ra3,dec3], etc]
+    
+    radians (optional, defaults to True) : type = boolean - True if coordinates of vertices are in radians
+    
+    Returns
+    -------------
+    area contained within polygon in square degrees
+    
+    '''
+    
+    if not radians: #TJ convert to radians if needed
+        vertices = np.radians(vertices)
+
+    num_corners = len(vertices) #TJ calculate the number of corners
+    total_excess = 0 #TJ initialize total excess angle
+
+    for i in range(num_corners):
+        A = np.array(cartesian(vertices[i - 1]))
+        B = np.array(cartesian(vertices[i]))
+        C = np.array(cartesian(vertices[(i + 1) % num_corners]))
+
+        #TJ compute angle at vertex B using dot product of great-circle vectors
+        #TJ see Girard’s Theorem (Spherical Excess) via Cartesian Vectors for derivation
+        #TJ np.clip prevents numerical errors like np.sin(np.pi/2) not equaling 1
+        #TJ np.linalg.norm calculates the magnitude of a vector
+        numerator = np.dot(np.cross(A, B), np.cross(C, B)) 
+        denominator = np.linalg.norm(np.cross(A, B)) * np.linalg.norm(np.cross(C, B))
+        angle = np.arccos(numerator / denominator)
+        
+        total_excess += angle
+
+    #TJ spherical excess formula
+    E = total_excess - (num_corners - 2) * np.pi
+
+    #TJ area on a sphere, converted to square degrees
+    return E * (180/np.pi)**2
 
 
 def evenly_populate_sphere(n_dots):
-    '''generates n_dots number of ra and dec values such that they will be evenly distributed over a sphere.
+    '''generates n_dots number of ra and dec values (in radians) such that they will be evenly distributed over a sphere.
 
-    imports needed packages automatically
+    *imports needed packages automatically
     
     Parameters
     -------------
     n_dots : type = int - integer number of dots you want to appear on the sphere
-    
     
 
     Returns
@@ -114,7 +159,9 @@ def evenly_populate_sphere(n_dots):
     dec = np.arcsin(1.-random(n_dots)*2.) #TJ creates random declinations in radians between +pi/2 and -pi/2
     return ra, dec
 
-def is_it_in(dots, lat_long_box):
+
+
+def is_it_in(dots, lat_long_box, radians = False):
     '''determines whether a coordinate (or list of coordinates) is within a given lat-long box
     
     Parameters
@@ -122,6 +169,8 @@ def is_it_in(dots, lat_long_box):
     dots : type = list - list of ra, dec coordinates in radians, corresponding to dots on a sphere
                 
     lat_long_box : type = list - given in the format [ra_min, ra_max, dec_min, dec_max]
+    
+    radians (optional, defaults to False) : type = boolean - units for BOTH boundaries of box AND coordinates of dots
     
                     for example, to generate dots inside a lat-long box with ra, dec = [5hr-8hr, 0deg-15deg]: 
                             box = np.radians([(5*15), (8*15), (0), (15)])
@@ -133,73 +182,187 @@ def is_it_in(dots, lat_long_box):
     -------------
     boolean value True if coordinate is within box (inclusive of end values on both ends), False if not.
     '''
-    
+    if not radians:
+        import numpy as np
+        lat_long_box = np.radians(lat_long_box)
     ii = [((dot[0] >= lat_long_box[0]) & (dot[0] <= lat_long_box[1]) & 
           (dot[1] >= lat_long_box[2]) & (dot[1] <= lat_long_box[3])) for dot in dots]
 
     return ii #TJ return true or false array corresponding to True if a dot is inside the box
 
-def check_answers(boxes, num_dots=100000, radians=False, name = 'lat-long rectangles in aitoff-projection.png'):
-    '''checks that the ratio of the areas is the same as the ratio of the number of dots in each box
+def populate_box(box, num_dots = 1000000, radians = True):
+    '''populates a lat-long box with random dots by populating entire sphere, then filtering the ones outside of the box
     
-    imports neeeded packages automatically
+    imports all needed packages automatically
     
     Parameters
     -------------
-    boxes : type = list - given in the format [[ra_min1, ra_max1, dec_min1, dec_max1],
-                                               [ra_min2, ra_max2, dec_min2, dec_max2]]
-                        - or as a single box [ra_min, ra_max, dec_min, dec_max]
-                                               
-    num_dots (optional, defaults to 100,000) : type = int - number of dots, the bigger the number,
-                                               the closer the two sets of ratios should be
+    box : type = list - describes box in format [ra_min, ra_max, dec_min, dec_max]
                 
-                                               
-    name (optional, defaults to 'lat-long rectangles in aitoff-projection.png'): type = str - name of .png file
-
+    num_dots (optional, defaults to 1 million) : type = int - number of dots on full sphere (not number of dots inside box)
     
-    radians (optional, defaults to False): type = boolean
+    radians (optional, defaults to true) : type = boolean - False if output array of locations should be in degrees
     
     Returns
     -------------
-    Nothing.
-    Saves plot in working directory with given (or default) name.png, see "plot_rectangles()" function.
-    Prints ratios of areas of each boxes, normalized to the smallest area.
-    Prints number of the dots within each box, normalized to smallest number.
+    ra,dec for all the dots inside the lat-long box
     '''
-    
     import numpy as np
-    if radians == False:
-        boxes = np.radians(boxes)
-        rad = True
-    areas = plot_rectangles(boxes, radians = True)
-    normalized_areas = find_ratios(areas)
 
-    #TJ generate random points on a sphere
     ra, dec = evenly_populate_sphere(num_dots)
     all_dots = np.column_stack((ra, dec))  #TJ store as a NumPy array for easier indexing
 
-    #TJ generate list for each box, so all the true values in in_each[0] correspond to dots that are in box1
-    in_each = [all_dots[is_it_in(all_dots, box)] for box in boxes]
+    #TJ generate list of dots that are in box of format specified in homework task 2
+    in_box = all_dots[is_it_in(all_dots, box)]
+    ra = [x[0] for x in in_box]
+    dec = [x[1] for x in in_box]
+    if not radians:
+        return np.degrees(ra), np.degrees(dec)
+    else:
+        return ra,dec
     
-    #TJ count number of points in each box
-    num_dots_in_each = [len(each) for each in in_each]  
+    
 
-    #TJ print results, these two list should have every index be fairly close to eachother
-    #TJ note: these lists may differ if num_dots is low.
-    print(f'Ratio of number of dots in each box: \n{[round(float(r), 3) for r in find_ratios(num_dots_in_each)]}')
-    print(f'Ratio of areas of each box: \n{[round(float(r), 3) for r in normalized_areas]}')    
+def aitoff_plot_region(path, show_plot=True, save_plot=None, radians = False, name = 'bounded_region', 
+                       label_with_area = False, title = "regions on sphere"):
+    '''Plot regions bounded by path with vertices given in ra, dec in degrees (or radians if specified)
+        example: box_path = [[0,0], [0,15], [20,15], [10,0]] will plot an assymmetrical trapezoidal box
+    
+    imports needed packages automatically
+    *will need to manually import os before calling if save_plot = f'{os.getcwd()}'
+    
+    Parameters
+    -------------
+    path : type = list - contains entries for each corner of a closed path
+                        all coordinates given in degrees (unless radians = True is specified)
+                    
+    show_plot (optional, defaults to True) : type = boolean - False will suppress plot output
+                string multiple iterations of this function with show_plot = False, then call plt.show() to show 
+                all regions in single plot
+                    
+    save_plot (optional, defaults to None) : type = str - path to directory where plots will be saved to
+                             if directory is set to None, output plot will not be saved (can still print to screen)
+    
+    name (optional, defaults to 'bounded_region'): type = str - name of .png file to save as (if save_plot == True)
+                                                                This is also the name of the legend label for the region
+
+    radians (optional, defaults to False): type = boolean - specify whether or not corners are defined in radians or degrees
+    
+    label_with_area (optional, defaults to False) : type = boolean - choose to label each box with the area in square degrees
+    
+    title (optional, defaults to "regions on sphere") : type = str - plot title
+                For example, try:
+                    path1 = [[0,0], [0,15], [20,15], [10,0]]
+                    path2 = [[30,30], [30,45], [45,30]]
+                    aitoff_plot_region(path1, show_plot=False, save_plot=None, radians = False, name = 'region1')
+                    aitoff_plot_region(path2, show_plot=False, save_plot=None, radians = False, name = 'region2')
+                    aitoff_plot_region([], show_plot=True, save_plot=f'{os.getcwd()}', radians = False, name = 'testing_function')
+                    
+
+    
+    Returns
+    -------------
+    Nothing, just used to plot regions
+    
+    '''
+        
+    import matplotlib.pyplot as plt
+    import matplotlib.cm as cm
+    import numpy as np
+    import os
+    #TJ the way this function is written makes it difficult to save a plot of multiple regions with an informative title
+    #TJ to save a plot like this, call the function with an empty path, and save_plot = True, with name = figure_title
+    if path == []: #TJ check that path is not empty, if it is, this is likely just to save a set of plots
+        if not save_plot: #TJ this should never happem, print error message
+            print('function called with a blank path but save_plot set to False')
+            return None
+        else: 
+            os.makedirs(save_plot, exist_ok=True)  #TJ create the directory if it doesn't exist
+            save_path = os.path.join(save_plot, f'{name}.png') #TJ define the full path for saving plot
+            plt.savefig(save_path, dpi=300, bbox_inches='tight') #TJ save plot to specified directory
+            print(f'output plot saved to {save_plot} as filename = {name}.png')
+    else: #TJ if path is not empty, continue with plotting function
+        if not radians: #TJ convert to radians for aitoff projection if needed
+            path = np.radians(path)
+            ra_path = [p[0] for p in path] #TJ define right ascension of corners
+            dec_path = [p[1] for p in path] #TJ define declination of corners
+            ra_path.append(path[0][0]) #TJ append with first value so the path is closed
+            dec_path.append(path[0][1])
+        elif radians:
+            ra_path = [p[0] for p in path]
+            dec_path = [p[1] for p in path]
+            ra_path.append(path[0][0])
+            dec_path.append(path[0][1])
+
+        if not plt.get_fignums(): #If number of stored figures is zero, create new figure with appropriate axes
+            global num_plots
+            num_plots = 0
+            plt.figure(figsize=(8, 5))
+            ax = plt.subplot(111, projection="aitoff")
+            ax.set_xlabel("Right Ascension", fontsize=12)
+            ax.set_ylabel("Declination", fontsize=12)
+            ax.set_title(f"{title}", fontsize=12)
+            ax.grid(color='black', linestyle='--', linewidth=0.5)
+        num_plots+=1
+        ax = plt.gca() #TJ if a plot already exists, then just use that current plot and only add things to it
+
+        #TJ plot the path through all ra,dec corners
+        if label_with_area:
+            name = f'box {num_plots} area = {round(find_latlong_area(box),3)} sq deg'
+        ax.plot(ra_path, dec_path, linestyle='-', linewidth=2, label = name) 
+        ax.legend()
+
+        
+        if save_plot != None:
+            os.makedirs(save_plot, exist_ok=True)  #TJ create the directory if it doesn't exist
+            save_path = os.path.join(save_plot, f'{name}.png') #TJ define the full path for saving plot
+            plt.savefig(save_path, dpi=300, bbox_inches='tight') #TJ save plot to specified directory
+            print(f'output plot saved to {save_plot} with filename {name}.png') #TJ print if file was saved
+        if show_plot:
+            plt.show()
     return None
 
 
-
 if __name__ == "__main__":
-    #TJ create boxes to verify that the number of dots in each box is proportional to its area
+    import argparse
+    import os
+    import numpy as np
+    #TJ add argparse object and description
+    parser = argparse.ArgumentParser(description="Populate sphere evenly, then return dots that are in given box.") 
+    #TJ assign argument type and help note
+    parser.add_argument("directory", type=str, help="directory to save output plots to", default = './') 
 
-    boxes = [[(5*15), (8*15), (0), (15)], [(5*15), (8*15), (20), (35)], 
-             [(5*15), (8*15), (40), (55)], [(5*15), (8*15), (60), (75)],
-             [0, 360, 0, 90]] 
+    args = parser.parse_args() #TJ assign arugments
     
-    check_answers(boxes)
+    directory = args.directory
+    
+    #TJ create boxes that are progressively higher in declination and one thats a full hemisphere
+    boxes = [[(5*15), (8*15), (0), (15)], [(5*15), (8*15), (20), (35)], 
+         [(5*15), (8*15), (40), (55)], [(5*15), (8*15), (60), (75)],
+         [0, 360, 0, 90]]
+    for box in boxes:
+        aitoff_plot_region(boundaries_to_vertices(box), show_plot=False, label_with_area=True, title = 'task1')
+    aitoff_plot_region([], show_plot=True, save_plot = directory, name = 'progressively_higher_declination_boxes')
+    
+    box = [(5*15), (8*15), (20), (35)]
+    num_dots = 1000000
+    ra, dec = populate_box(box, num_dots = num_dots)
+    surface_area = 4*np.pi*(180/np.pi)**2
+    print(f'expected number of dots within box based on area within : {round(num_dots*find_latlong_area(box)/(surface_area))}')
+    print(f'actual number of dots observed in box : {len(ra)}')
+    
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:
