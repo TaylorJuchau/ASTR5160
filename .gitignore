@@ -1,4 +1,5 @@
 .*
 *.fits
+*.png
 Data_files
 !.gitignore
