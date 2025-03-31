@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[51]:
+# In[23]:
 
 
-def find_latlong_area(box, radians = False, vertices = False):
+def find_latlongrect_area(box, radians = False, vertices = False):
     '''find area enclosed in a lat-long box defined as box = [ra_min, ra_max, dec_min, dec_max] in square degrees
     
     *imports needed packages automatically
@@ -37,6 +37,10 @@ def find_latlong_area(box, radians = False, vertices = False):
         ra_min, ra_max, dec_min, dec_max = box
     #TJ compute area and convert to square degrees
     return ((ra_max - ra_min)*(np.sin(dec_max) - np.sin(dec_min)))*((180/np.pi)**2) 
+
+
+import numpy as np
+
 
 def boundaries_to_vertices(box, radians = False):
     '''Convert a box defined as bounded by [ra_min, ra_max, dec_min, dec_max] to a box defined by its vertices
@@ -93,10 +97,10 @@ def find_polygon_area(vertices, radians = True):
     '''find area enclosed by a polygon in square degrees, made from vertices connected by sections of great circles.
     
     **Important note** lat-lon boxes are NOT bounded by sections of great circles!!!
-    **Use find_latlong_area() instead for these regions.
+    **Use find_latlongrect_area() instead for these regions.
     
     *imports needed packages automatically
-    
+    *needs
     Parameters
     -------------
     vertices : type = list - list of vertices [[ra1,dec1], [ra2,dec2], [ra3,dec3], etc]
@@ -108,6 +112,8 @@ def find_polygon_area(vertices, radians = True):
     area contained within polygon in square degrees
     
     '''
+    
+    import numpy as np
     
     if not radians: #TJ convert to radians if needed
         vertices = np.radians(vertices)
@@ -122,7 +128,6 @@ def find_polygon_area(vertices, radians = True):
 
         #TJ compute angle at vertex B using dot product of great-circle vectors
         #TJ see Girard’s Theorem (Spherical Excess) via Cartesian Vectors for derivation
-        #TJ np.clip prevents numerical errors like np.sin(np.pi/2) not equaling 1
         #TJ np.linalg.norm calculates the magnitude of a vector
         numerator = np.dot(np.cross(A, B), np.cross(C, B)) 
         denominator = np.linalg.norm(np.cross(A, B)) * np.linalg.norm(np.cross(C, B))
@@ -172,11 +177,6 @@ def is_it_in(dots, lat_long_box, radians = False):
     
     radians (optional, defaults to False) : type = boolean - units for BOTH boundaries of box AND coordinates of dots
     
-                    for example, to generate dots inside a lat-long box with ra, dec = [5hr-8hr, 0deg-15deg]: 
-                            box = np.radians([(5*15), (8*15), (0), (15)])
-                            ra, dec = evenly_populate_sphere(1000)
-                            inside = is_it_in([ra,dec], box)
-                            dots_in_region = [ra[inside], dec[inside]]
 
     Returns
     -------------
@@ -193,7 +193,10 @@ def is_it_in(dots, lat_long_box, radians = False):
 def populate_box(box, num_dots = 1000000, radians = True):
     '''populates a lat-long box with random dots by populating entire sphere, then filtering the ones outside of the box
     
-    imports all needed packages automatically
+    imports all standard packages automatically
+    *requires the following functions from parent module "ASTRO5160/Homeworks/HW_2.py":
+                        "evenly_populate_sphere()"
+                        "is_it_in()"
     
     Parameters
     -------------
@@ -209,7 +212,7 @@ def populate_box(box, num_dots = 1000000, radians = True):
     '''
     import numpy as np
 
-    ra, dec = evenly_populate_sphere(num_dots)
+    ra, dec = evenly_populate_sphere(num_dots) #TJ populate entire sphere with num_dots
     all_dots = np.column_stack((ra, dec))  #TJ store as a NumPy array for easier indexing
 
     #TJ generate list of dots that are in box of format specified in homework task 2
@@ -249,14 +252,19 @@ def aitoff_plot_region(path, show_plot=True, save_plot=None, radians = False, na
     radians (optional, defaults to False): type = boolean - specify whether or not corners are defined in radians or degrees
     
     label_with_area (optional, defaults to False) : type = boolean - choose to label each box with the area in square degrees
+                                                    **NOTE** area only works if this is a rectangular lat-long box.
     
     title (optional, defaults to "regions on sphere") : type = str - plot title
                 For example, try:
+                    import os
                     path1 = [[0,0], [0,15], [20,15], [10,0]]
                     path2 = [[30,30], [30,45], [45,30]]
-                    aitoff_plot_region(path1, show_plot=False, save_plot=None, radians = False, name = 'region1')
-                    aitoff_plot_region(path2, show_plot=False, save_plot=None, radians = False, name = 'region2')
-                    aitoff_plot_region([], show_plot=True, save_plot=f'{os.getcwd()}', radians = False, name = 'testing_function')
+                    aitoff_plot_region(path1, show_plot=False, save_plot=None, radians = False, 
+                    name = 'region1', title = 'test plot')
+                    aitoff_plot_region(path2, show_plot=False, save_plot=None, radians = False, 
+                    name = 'region2')
+                    aitoff_plot_region([], show_plot=True, save_plot=f'{os.getcwd()}', radians = False,
+                    name = 'testing_function')
                     
 
     
@@ -267,7 +275,6 @@ def aitoff_plot_region(path, show_plot=True, save_plot=None, radians = False, na
     '''
         
     import matplotlib.pyplot as plt
-    import matplotlib.cm as cm
     import numpy as np
     import os
     #TJ the way this function is written makes it difficult to save a plot of multiple regions with an informative title
@@ -308,7 +315,7 @@ def aitoff_plot_region(path, show_plot=True, save_plot=None, radians = False, na
 
         #TJ plot the path through all ra,dec corners
         if label_with_area:
-            name = f'box {num_plots} area = {round(find_latlong_area(box),3)} sq deg'
+            name = f'box {num_plots} area = {round(find_latlongrect_area(box),3)} sq deg'
         ax.plot(ra_path, dec_path, linestyle='-', linewidth=2, label = name) 
         ax.legend()
 
@@ -334,21 +341,22 @@ if __name__ == "__main__":
 
     args = parser.parse_args() #TJ assign arugments
     
-    directory = args.directory
+    directory = args.directory #TJ assign variable to the provided argument
     
     #TJ create boxes that are progressively higher in declination and one thats a full hemisphere
     boxes = [[(5*15), (8*15), (0), (15)], [(5*15), (8*15), (20), (35)], 
          [(5*15), (8*15), (40), (55)], [(5*15), (8*15), (60), (75)],
          [0, 360, 0, 90]]
-    for box in boxes:
+    for box in boxes: #TJ plot all boxes in same graph
         aitoff_plot_region(boundaries_to_vertices(box), show_plot=False, label_with_area=True, title = 'task1')
+    #TJ name the final .png file and output to screen and save to directory
     aitoff_plot_region([], show_plot=True, save_plot = directory, name = 'progressively_higher_declination_boxes')
     
-    box = [(5*15), (8*15), (20), (35)]
-    num_dots = 1000000
-    ra, dec = populate_box(box, num_dots = num_dots)
-    surface_area = 4*np.pi*(180/np.pi)**2
-    print(f'expected number of dots within box based on area within : {round(num_dots*find_latlong_area(box)/(surface_area))}')
+    box = [(5*15), (8*15), (20), (35)] #TJ define box to populate with dots
+    num_dots = 1000000 #TJ set number of dots to populate entire sphere with
+    ra, dec = populate_box(box, num_dots = num_dots) #TJ generate ra,dec values all over the sphere
+    surface_area = 4*np.pi*(180/np.pi)**2 #TJ define entire surface area of sphere in square degrees
+    print(f'expected number of dots within box based on area within : {round(num_dots*find_latlongrect_area(box)/(surface_area))}')
     print(f'actual number of dots observed in box : {len(ra)}')
     
 

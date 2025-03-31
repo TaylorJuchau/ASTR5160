@@ -3,3 +3,9 @@
 *.png
 Data_files
 !.gitignore
+!Class18_stars.fits
+!Class18_qsos.fits
+!Class18_wrg_star.fits
+!Class18_wrg_qso.fits
+!Class18_SDSS_stars.txt
+!Class18_SDSS_qsos.txt
