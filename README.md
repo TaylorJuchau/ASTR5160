@@ -2,9 +2,11 @@
 Astronomical Techniques II Spring 2025
 
 # Homeworks:
-HW_0 ---Week0------------make a line, and scatter points away from it
+HW_0 ---------------Make a line, and scatter points away from it
 
-HW_1 ---Week4------------Find lowest airmass object for every day in a month
+HW_1 ---------------Find lowest airmass object for every day in a month
+
+HW_2 ---------------Evenly populate sphere, populate lat-long box, find area of different regions
 
 # Week2 #
 
@@ -36,3 +38,28 @@ Class10_notebook -----caps bound by RA or dec, or centered around a point with a
 Class11_notebook -----Mangle files, finding overlapping regions on a sphere
 
 Class12_notebook -----Making regions bounded by RA and Dec lines
+
+# Week7 #
+
+Class13_notebook ------No class
+
+Class14_notebook ------Import packages from sub directories with __init__ files
+
+# Week8 #
+
+Class15_notebook ------Plot results from SQL survey, make brighter objects be bigger dots
+
+Class16_notebook ------Decode sweep names, SDSS query objects, find which files are needed for list of objects
+
+# Week9 #
+
+SPRING BREAK, NO CLASS
+
+# Week10 #
+
+Class17_notebook ------convert UBVRI to ugriz
+
+Class18_notebook ------manipulate table magnitudes, find line of best separation between two classes of objects on a color-color
+
+# Week11 #
+
