@@ -1,11 +1,8 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[44]:
-
-
 import time
 start = time.time()#TJ get exact start time (for computing total execution time)
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), '..'))) #TJ change directory to include the entire ASTRO5160 directory
 from astropy.table import Table, vstack, Column, Row
 from astropy import units as u
 from astropy.io import fits
@@ -15,6 +12,31 @@ import numpy as np
 import matplotlib.pyplot as plt
 import subprocess
 import argparse
+from Week8.Class16_notebook import *
+
+
+def is_it_in(objs, box):
+    """Determine which of an array of objects are inside an RA, Dec box. Trimmed version of ADAM's function with inclusive boundaries
+
+    Parameters
+    -------------
+    objs :  type = astropy.table or list - array of objects, must include columns titled "RA" and "DEC"
+    box :  type = list - list of floats corresponding to the boundaries of the box
+                *must be in format [ra_min, ra_max, dec_min, dec_max] with boundaries in degrees*
+    
+    Returns
+    -------------
+    original objs replaced with boolean values stating whether they are in the box (True) or not (False)
+        
+    """
+
+    ramin, ramax, decmin, decmax = box
+
+    ii = ((objs["RA"] >= ramin) & (objs["RA"] <= ramax) & (objs["DEC"] >= decmin) & (objs["DEC"] <= decmax))
+
+    return ii #TJ return true or false array
+
+
 
 def read_partial_fits(filepath, kept_column_names):
     '''read in table and only save necessary columns this saves memory and time with further manipulations compared to saving EVERY column
@@ -151,15 +173,15 @@ def add_sdss_u_and_i_mag_columns(table, sdss_path='/d/scratch/ASTR5160/week8/sds
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="""No arguments accepted at command line. Searches 'FIRST' data for objects within 3 degrees 
+    '''parser = argparse.ArgumentParser(description="""No arguments accepted at command line. Searches 'FIRST' data for objects within 3 degrees 
     of ra, dec = (163, 50). Cross matches these objects to objects in the legacy north sweep surveys that have W1-W2 colors of > 0.5 AND 
     r_magnitudes of < 22, then records their g, r, z, and WISE 1-4 nanomaggy flux values and magnitudes. Queries the SDSS database to get 
     their u and i magnitudes and converts to nanomaggy fluxes. Finds the object in this dataset that is brightest in the u_band and plots
     these nine flux values as a function of wavelength. Prints brief comment about results.""") #TJ add argparse informative help statement
     #TJ apparently you need to add at least one argument (even if its useless) to make --help command visible?
     parser.add_argument('--dummy', help=argparse.SUPPRESS)  #TJ completely useless, hidden dummy argument
-    args = parser.parse_args()
-
+    args = parser.parse_args()'''
+    
     #TJ define filepath to FIRST dataset
     FIRST_filepath = '/d/scratch/ASTR5160/data/first/first_08jul16.fits'
     FIRST_data = read_partial_fits(FIRST_filepath, ["RA", "DEC"]) #TJ we only need ra and dec from this table.
@@ -172,10 +194,7 @@ if __name__ == "__main__":
     
     sweep_directory = '/d/scratch/ASTR5160/data/legacysurvey/dr9/north/sweep/9.0/' #TJ assign necessary sweep file directory
     #TJ assign needed sweep file paths
-    sweep_files = [sweep_directory + 'sweep-150p045-160p050.fits', 
-                   sweep_directory + 'sweep-160p045-170p050.fits', 
-                   sweep_directory + 'sweep-150p050-160p055.fits', 
-                   sweep_directory + 'sweep-160p050-170p055.fits'] 
+    sweep_files = search_directory_for_location(sweep_directory, in_survey)
     #TJ only save data in columns we actually need, this table has WAYYYY too many columns and it slows down computation time to perform
     #TJ manipulations on the entire table.
     sweep_columns_to_keep = ['RA', 'DEC', 'FLUX_R', 'FLUX_G', 'FLUX_Z', 'FLUX_W1', 'FLUX_W2', 'FLUX_W3', 'FLUX_W4']
@@ -248,11 +267,4 @@ if __name__ == "__main__":
     print()
     print(f"Script finished in {time.time() - start:.2f} seconds")
     print()
-    print('When I run this script on my office computer (ret1) from scratch, I sometimes get times as low as 70 seconds, and sometimes 300 seconds \nif you get a time that is larger than a 90 seconds, try running again and see if it changes')
-
-
-# In[ ]:
-
-
-
-
+    print('After re-running this script from scratch a bunch of times, the median time (in seconds) was 73, with a mean of 146 \nand a standard deviation of 115. Note that this distribution is heavily skewed to longer runtimes and no trial took LESS than 70 seconds')
