@@ -15,29 +15,6 @@ import argparse
 from Week8.Class16_notebook import *
 
 
-def is_it_in(objs, box):
-    """Determine which of an array of objects are inside an RA, Dec box. Trimmed version of ADAM's function with inclusive boundaries
-
-    Parameters
-    -------------
-    objs :  type = astropy.table or list - array of objects, must include columns titled "RA" and "DEC"
-    box :  type = list - list of floats corresponding to the boundaries of the box
-                *must be in format [ra_min, ra_max, dec_min, dec_max] with boundaries in degrees*
-    
-    Returns
-    -------------
-    original objs replaced with boolean values stating whether they are in the box (True) or not (False)
-        
-    """
-
-    ramin, ramax, decmin, decmax = box
-
-    ii = ((objs["RA"] >= ramin) & (objs["RA"] <= ramax) & (objs["DEC"] >= decmin) & (objs["DEC"] <= decmax))
-
-    return ii #TJ return true or false array
-
-
-
 def read_partial_fits(filepath, kept_column_names):
     '''read in table and only save necessary columns this saves memory and time with further manipulations compared to saving EVERY column
     -------------

@@ -221,7 +221,7 @@ def search_directory_for_location(directory, objects_list):
     import numpy as np
     fits_files = sorted(glob.glob(os.path.join(directory, "*.fits"))) #TJ find only fits files in directory
     boxes = [decode_sweep_name(file) for file in fits_files] #TJ extract boxes that each fits file contains
-    all_files = np.array([is_in_box(objects_list, box) for box in boxes]) #TJ this creates a true false list for all 100 objects,
+    all_files = np.atleast_2d([is_in_box(objects_list, box) for box in boxes])
     #TJ for whether or not that object is in that file's box. An array of all Falses would mean no objects are in that file's box
     needed_indices = np.where(all_files.any(axis=1))[0] #TJ this grabs the indices corresponding to all the sublists where at least one True exists
     needed_files = [fits_files[i] for i in needed_indices] #TJ this uses those indices to grab just the files where at least one object is inside
@@ -253,7 +253,7 @@ if __name__ == "__main__":
 
 
 
-# In[ ]:
+# In[1]:
 
 
 
