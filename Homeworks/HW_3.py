@@ -173,14 +173,14 @@ def add_sdss_u_and_i_mag_columns(table, sdss_path='/d/scratch/ASTR5160/week8/sds
 
 
 if __name__ == "__main__":
-    '''parser = argparse.ArgumentParser(description="""No arguments accepted at command line. Searches 'FIRST' data for objects within 3 degrees 
+    parser = argparse.ArgumentParser(description="""No arguments accepted at command line. Searches 'FIRST' data for objects within 3 degrees 
     of ra, dec = (163, 50). Cross matches these objects to objects in the legacy north sweep surveys that have W1-W2 colors of > 0.5 AND 
     r_magnitudes of < 22, then records their g, r, z, and WISE 1-4 nanomaggy flux values and magnitudes. Queries the SDSS database to get 
     their u and i magnitudes and converts to nanomaggy fluxes. Finds the object in this dataset that is brightest in the u_band and plots
     these nine flux values as a function of wavelength. Prints brief comment about results.""") #TJ add argparse informative help statement
     #TJ apparently you need to add at least one argument (even if its useless) to make --help command visible?
     parser.add_argument('--dummy', help=argparse.SUPPRESS)  #TJ completely useless, hidden dummy argument
-    args = parser.parse_args()'''
+    args = parser.parse_args()
     
     #TJ define filepath to FIRST dataset
     FIRST_filepath = '/d/scratch/ASTR5160/data/first/first_08jul16.fits'
