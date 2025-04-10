@@ -179,7 +179,6 @@ if __name__ == "__main__":
     their u and i magnitudes and converts to nanomaggy fluxes. Finds the object in this dataset that is brightest in the u_band and plots
     these nine flux values as a function of wavelength. Prints brief comment about results.""") #TJ add argparse informative help statement
     #TJ apparently you need to add at least one argument (even if its useless) to make --help command visible?
-    parser.add_argument('--dummy', help=argparse.SUPPRESS)  #TJ completely useless, hidden dummy argument
     args = parser.parse_args()
     
     #TJ define filepath to FIRST dataset
