@@ -5,14 +5,14 @@
 
 
 #TJ import needed functions
+import os
+import glob
+import numpy as np
 if __name__ == "__main__":
     from astropy.table import Table
     from astropy.utils.data import get_pkg_data_filename
     import matplotlib.pyplot as plt
     from time import sleep
-    import os
-    import glob
-    import numpy as np
 
 
 # In[2]:

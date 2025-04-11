@@ -310,7 +310,7 @@ print(f'This method misclassified {min_misclassed_stars} stars as qsos and miscl
 print(f'This line correctly divides {round((1-(min_misclassified/(len(qsos)+len(stars))))*100,2)} % of the objects')
 
 
-def what_is_it(object, m = 0.8862876254180598, b= -0.652173913043478):
+def what_is_it(obj, m = 0.8862876254180598, b= -0.652173913043478):
     '''Use a dividing line with slope = m and y-intercept = b so determine if the object is a star or a QSO
 
     -------------
@@ -329,8 +329,8 @@ def what_is_it(object, m = 0.8862876254180598, b= -0.652173913043478):
     'QSO' if object is above the dividing line
     'star' if object is below the dividing line
     '''
-    gmz = object["g_mag"] - object["z_mag"]
-    rmW1 = object["r_mag"]-object["W1_mag"]
+    gmz = obj["g_mag"] - obj["z_mag"]
+    rmW1 = obj["r_mag"]-obj["W1_mag"]
     if rmW1 > (m * gmz + b):
         return 'QSO'
     elif rmW1 < (m * gmz + b):
